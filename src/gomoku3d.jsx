@@ -217,7 +217,7 @@ const getBestMove = (boardState, player, depth, alpha, beta, winPatterns) => {
       const result = getBestMove(boardState, opponent, depth - 1, alpha, beta, winPatterns);
       boardState[z][x][y] = null; // 戻す
 
-      if (result.score > bestScore) {
+      if (result.score >= bestScore) {
         bestScore = result.score;
         bestMove = [z, x, y];
       }
@@ -236,7 +236,7 @@ const getBestMove = (boardState, player, depth, alpha, beta, winPatterns) => {
       const result = getBestMove(boardState, opponent, depth - 1, alpha, beta, winPatterns);
       boardState[z][x][y] = null;
 
-      if (result.score < bestScore) {
+      if (result.score <= bestScore) {
         bestScore = result.score;
         bestMove = [z, x, y];
       }
@@ -521,6 +521,26 @@ const Game3D = () => {
         </div>
       </div>
 
+      {/* 勝利 or 現在のプレイヤー 表示: 2D と 3D の間に配置 */}
+      <div className="mb-8 text-center">
+        {winner ? (
+          <div className="text-2xl font-bold mb-4">
+            Player{' '}
+            <span className={winner === 'X' ? 'text-blue-400' : 'text-red-400'}>
+              {winner}
+            </span>{' '}
+            wins! 🎉
+          </div>
+        ) : (
+          <div className="text-xl mb-4">
+            Current Player:{' '}
+            <span className={currentPlayer === 'X' ? 'text-blue-400' : 'text-red-400'}>
+              {currentPlayer}
+            </span>
+          </div>
+        )}
+      </div>
+
       {/* 3D ビュー */}
       <div className="mb-8">
         <h2 className="text-2xl font-bold mb-4 text-blue-400">
@@ -620,28 +640,15 @@ const Game3D = () => {
         </p>
       </div>
 
-      {/* 勝敗とリセットボタン */}
-      <div className="mt-8 text-center">
-        {winner ? (
-          <div className="text-2xl font-bold mb-4">
-            Player {winner} wins! 🎉
-          </div>
-        ) : (
-          <div className="text-xl mb-4">
-            Current Player:{' '}
-            <span className={currentPlayer === 'X' ? 'text-blue-400' : 'text-red-400'}>
-              {currentPlayer}
-            </span>
-          </div>
-        )}
-
-        <button
-          className="px-6 py-3 bg-blue-500 hover:bg-blue-600 rounded-lg font-bold transition-colors"
-          onClick={resetGame}
-        >
-          New Game
-        </button>
-      </div>
+        {/* リセットボタン */}
+        <div className="text-center">
+            <button
+                className="px-6 py-3 bg-blue-500 hover:bg-blue-600 rounded-lg font-bold transition-colors"
+                onClick={resetGame}
+            >
+                New Game
+            </button>
+        </div>
     </div>
   );
 };
