@@ -217,7 +217,7 @@ const getBestMove = (boardState, player, depth, alpha, beta, winPatterns) => {
       const result = getBestMove(boardState, opponent, depth - 1, alpha, beta, winPatterns);
       boardState[z][x][y] = null; // 戻す
 
-      if (result.score >= bestScore) {
+      if (result.score > bestScore) {
         bestScore = result.score;
         bestMove = [z, x, y];
       }
@@ -236,7 +236,7 @@ const getBestMove = (boardState, player, depth, alpha, beta, winPatterns) => {
       const result = getBestMove(boardState, opponent, depth - 1, alpha, beta, winPatterns);
       boardState[z][x][y] = null;
 
-      if (result.score <= bestScore) {
+      if (result.score < bestScore) {
         bestScore = result.score;
         bestMove = [z, x, y];
       }
