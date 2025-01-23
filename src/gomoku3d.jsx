@@ -108,8 +108,8 @@ const isBoardFull = (boardState) => {
 const evaluateBoard = (boardState, winPatterns) => {
     // まず、即勝利判定
     const winner = checkWinner(boardState, winPatterns);
-    if (winner === 'X') return Number.POSITIVE_INFINITY;
-    if (winner === 'O') return Number.NEGATIVE_INFINITY;
+    if (winner === 'X') return 10000;
+    if (winner === 'O') return -10000;
   
     let score = 0;
     for (const pattern of winPatterns) {
@@ -209,7 +209,7 @@ const getBestMove = (boardState, player, depth, alpha, beta, winPatterns) => {
 
   if (player === 'X') {
     // X (maximize)
-    let bestScore = Number.NEGATIVE_INFINITY;
+    let bestScore = -100000;
     let bestMove = null;
 
     for (const [z, x, y] of availableMoves) {
@@ -228,7 +228,7 @@ const getBestMove = (boardState, player, depth, alpha, beta, winPatterns) => {
     return { score: bestScore, move: bestMove };
   } else {
     // O (minimize)
-    let bestScore = Number.POSITIVE_INFINITY;
+    let bestScore = 100000;
     let bestMove = null;
 
     for (const [z, x, y] of availableMoves) {
