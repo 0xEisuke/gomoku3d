@@ -525,9 +525,9 @@ const Game3D = () => {
         <div className="mb-8 text-center">
           {winner ? (
             winner === 'X' ? (
-            <div className="text-2xl font-bold mb-4">You win! 🎉</div>
+            <div className="text-3xl font-bold mb-4 text-red-400">You win! 🎉</div>
             ) : (
-            <div className="text-2xl font-bold mb-4">You lose...</div>
+            <div className="text-3xl font-bold mb-4 text-blue-400">You lose...</div>
             )
           ) : currentPlayer === 'X' ? (
             <div className="text-xl mb-4 text-blue-400">
