@@ -267,7 +267,7 @@ const Game3D = () => {
   const [currentPlayer, setCurrentPlayer] = useState('X'); // 人間: X, AI: O
   const [winner, setWinner] = useState(null);
   const [winningCells, setWinningCells] = useState([]);
-  const [selectedLevel, setSelectedLevel] = useState(0);
+  const [selectedLayer, setSelectedLayer] = useState(0);
 
   // 3D操作
   const [rotation, setRotation] = useState({ x: 20, y: 45 });
@@ -310,11 +310,11 @@ const Game3D = () => {
     if (winner || currentPlayer !== 'X') return;
 
     // 空いてないなら無視
-    if (board[selectedLevel][x][y]) return;
+    if (board[selectedLayer][x][y]) return;
 
     // X を置く
     const newBoard = JSON.parse(JSON.stringify(board));
-    newBoard[selectedLevel][x][y] = 'X';
+    newBoard[selectedLayer][x][y] = 'X';
 
     // 勝敗チェック
     const result = checkWinnerAndCells(newBoard);
@@ -384,7 +384,7 @@ const Game3D = () => {
     setBoard(initialBoard);
     setWinner(null);
     setWinningCells([]);
-    setSelectedLevel(0);
+    setSelectedLayer(0);
     setAiLastMove(null);
     setCurrentPlayer('X');
   };
@@ -487,17 +487,17 @@ const Game3D = () => {
       {/* レベル(=z次元)切り替えボタン */}
       <div className="mb-6">
         <div className="flex space-x-4 mb-4">
-          {[0, 1, 2, 3].map((level) => (
+          {[0, 1, 2, 3].map((layer) => (
             <button
-              key={level}
+              key={layer}
               className={`px-4 py-2 rounded ${
-                selectedLevel === level
+                selectedLayer === layer
                   ? 'bg-blue-500 text-white'
                   : 'bg-gray-700 hover:bg-gray-600'
               }`}
-              onClick={() => setSelectedLevel(level)}
+              onClick={() => setSelectedLayer(layer)}
             >
-              Level {level + 1}
+              Layer {layer + 1}
             </button>
           ))}
         </div>
@@ -506,11 +506,11 @@ const Game3D = () => {
       {/* 2D 表示 */}
       <div className="relative perspective-1000 mb-12">
         <div className="grid grid-cols-4 gap-2 transform rotate-x-45 rotate-z-45">
-          {board[selectedLevel].map((row, x) =>
+          {board[selectedLayer].map((row, x) =>
             row.map((cell, y) => (
               <button
                 key={`${x}-${y}`}
-                className={getCellClassName(selectedLevel, x, y)}
+                className={getCellClassName(selectedLayer, x, y)}
                 onClick={() => handleClick(x, y)}
                 disabled={winner || cell || currentPlayer !== 'X'}
               >
@@ -521,27 +521,26 @@ const Game3D = () => {
         </div>
       </div>
 
-      {/* 勝利 or 現在のプレイヤー 表示: 2D と 3D の間に配置 */}
-      <div className="mb-8 text-center">
-        {winner ? (
-          <div className="text-2xl font-bold mb-4">
-            Player{' '}
-            <span className={winner === 'X' ? 'text-blue-400' : 'text-red-400'}>
-              {winner}
-            </span>{' '}
-            wins! 🎉
-          </div>
-        ) : (
-          <div className="text-xl mb-4">
-            Current Player:{' '}
-            <span className={currentPlayer === 'X' ? 'text-blue-400' : 'text-red-400'}>
-              {currentPlayer}
-            </span>
-          </div>
-        )}
-      </div>
+    {/* 勝利 or 現在のプレイヤー 表示: 2D と 3D の間に配置 */}
+        <div className="mb-8 text-center">
+          {winner ? (
+            winner === 'X' ? (
+            <div className="text-2xl font-bold mb-4">You win! 🎉</div>
+            ) : (
+            <div className="text-2xl font-bold mb-4">You lose...</div>
+            )
+          ) : currentPlayer === 'X' ? (
+            <div className="text-xl mb-4 text-blue-400">
+            <span>It's your turn</span>
+            </div>
+          ) : (
+            <div className="text-xl mb-4 text-red-400">
+            <span>AI is thinking...</span>
+            </div>
+          )}
+        </div>
 
-      {/* 3D ビュー */}
+        {/* 3D ビュー */}
       <div className="mb-8">
         <h2 className="text-2xl font-bold mb-4 text-blue-400">
           3D View
@@ -573,8 +572,8 @@ const Game3D = () => {
               transition: isDragging ? 'none' : 'transform 0.3s ease-out',
             }}
           >
-            {board.map((level, z) =>
-              level.map((row, x) =>
+            {board.map((layer, z) =>
+              layer.map((row, x) =>
                 row.map((cell, y) => {
                   const isWinning = isCellInWinningPattern(z, x, y);
                   const isAiMove = isAiLastMove(z, x, y);
