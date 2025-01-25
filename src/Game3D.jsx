@@ -42,6 +42,9 @@ const Game3D = () => {
   // 新しいステート: リーチ警告用
   const [threatCells, setThreatCells] = useState([]); // リーチのマスを記録
 
+  const [moveHistory, setMoveHistory] = useState([]); // 履歴管理
+
+
   // パターン事前生成
   const winPatterns = React.useMemo(() => generateWinPatterns(), []);
 
@@ -76,6 +79,9 @@ const Game3D = () => {
 
     const newBoard = JSON.parse(JSON.stringify(board));
     newBoard[selectedLayer][x][y] = 'X';
+
+    // 履歴に現在の状態を保存
+    setMoveHistory((prev) => [...prev, { board: board, player: 'X' }]);
 
     const result = checkWinnerAndCells(newBoard);
     if (result) {
@@ -117,6 +123,9 @@ const Game3D = () => {
     newBoard[z][x][y] = 'O';
     setAiLastMove([z, x, y]);
 
+    // 履歴に現在の状態を保存
+    setMoveHistory((prev) => [...prev, { board: board, player: 'O' }]);
+
     const result = checkWinnerAndCells(newBoard);
     if (result) {
       setBoard(newBoard);
@@ -139,6 +148,23 @@ const Game3D = () => {
     setAiLastMove(null);
     setCurrentPlayer('X');
   };
+
+  const handleUndo = () => {
+    if (moveHistory.length < 2) return; // AIとプレイヤーの手がなければ戻れない
+  
+    const newHistory = [...moveHistory];
+    newHistory.pop(); // AIの手を削除
+    const previousState = newHistory.pop(); // プレイヤーの手を削除
+  
+    if (previousState) {
+      setBoard(previousState.board);
+      setMoveHistory(newHistory);
+      setCurrentPlayer('X'); // プレイヤーの手番に戻す
+      setThreatCells([]);
+      setWinner(null);
+    }
+  };
+  
 
   // 3D操作
   const handleMouseDown = (e) => {
@@ -302,6 +328,23 @@ const Game3D = () => {
       {/* 勝敗 or プレイヤーの状態 */}
       <div className="mb-8 text-center">{renderTurnOrResult()}</div>
 
+      {/* Undo ボタン */}
+      <button
+        onClick={handleUndo}
+        className="px-6 py-3 bg-blue-500 hover:bg-blue-600 rounded-lg font-bold mt-4 transition-colors"
+        disabled={moveHistory.length < 2} // 履歴が2手未満の場合は無効化
+      >
+        Undo Last Move
+      </button>
+
+      {/* New Game ボタン */}
+      <button
+        className="px-6 py-3 bg-blue-500 hover:bg-blue-600 rounded-lg font-bold  mt-4 transition-colors"
+        onClick={resetGame}
+      >
+        New Game
+      </button>
+
       {/* 3D 表示 */}
       <ThreeDView
         board={board}
@@ -314,13 +357,6 @@ const Game3D = () => {
         isAiLastMove={isAiLastMove}
         threatCells={threatCells} // リーチマスを渡す
       />
-
-      <button
-        className="px-6 py-3 bg-blue-500 hover:bg-blue-600 rounded-lg font-bold transition-colors"
-        onClick={resetGame}
-      >
-        New Game
-      </button>
     </div>
   );
 };
