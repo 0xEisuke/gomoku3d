@@ -3,7 +3,8 @@ import React, { useState, useEffect, useRef } from 'react';
 import {
   generateWinPatterns,
   checkWinner,
-  isBoardFull
+  isBoardFull,
+  findThreats,
 } from './logic/boardUtils.js';
 import { evaluateBoard, getAvailableMoves } from './logic/evaluation.js';
 import { getBestMove } from './logic/ai.js';
@@ -37,6 +38,9 @@ const Game3D = () => {
   const containerRef = useRef(null);
 
   const [aiLastMove, setAiLastMove] = useState(null);
+
+  // 新しいステート: リーチ警告用
+  const [threatCells, setThreatCells] = useState([]); // リーチのマスを記録
 
   // パターン事前生成
   const winPatterns = React.useMemo(() => generateWinPatterns(), []);
@@ -119,6 +123,9 @@ const Game3D = () => {
       setWinner(result.winner);
       setWinningCells(result.winningCells);
     } else {
+      // リーチ判定（AIが仕掛けたリーチを特定）
+      const threats = findThreats(newBoard, winPatterns, 'O');
+      setThreatCells(threats); // リーチマスをステートに保存
       setBoard(newBoard);
       setCurrentPlayer('X');
     }
@@ -232,12 +239,30 @@ const Game3D = () => {
       }
     } else {
       if (currentPlayer === 'X') {
-        return <div className="text-xl mb-4 text-blue-400">It's your turn</div>;
+        return (
+          <div>
+            <div className="text-xl mb-4 text-blue-400">It's your turn</div>
+            {/* AIがリーチを仕掛けている場合の警告文 */}
+            {threatCells.length > 0 && (
+              <div className="text-xl text-white">
+                Warning: AI is one move away from winning in{' '}
+                <span className="text-red-400 font-bold text-2xl">
+                  {threatCells.length}
+                </span>{' '}
+                {threatCells.length === 1 ? 'place!' : 'places!'}
+              </div>
+            
+            
+            )}
+          </div>
+        );
       } else {
         return <div className="text-xl mb-4 text-red-400">AI is thinking...</div>;
       }
     }
   };
+
+
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-gray-900 text-white p-4">
@@ -271,6 +296,7 @@ const Game3D = () => {
         winner={winner}
         getCellClassName={getCellClassName}
         onCellClick={handleClick}
+        threatCells={threatCells} // リーチマスを渡す
       />
 
       {/* 勝敗 or プレイヤーの状態 */}
@@ -286,6 +312,7 @@ const Game3D = () => {
         centerOffset={centerOffset}
         isCellInWinningPattern={isCellInWinningPattern}
         isAiLastMove={isAiLastMove}
+        threatCells={threatCells} // リーチマスを渡す
       />
 
       <button

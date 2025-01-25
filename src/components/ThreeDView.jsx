@@ -10,7 +10,12 @@ const ThreeDView = ({
   centerOffset,
   isCellInWinningPattern,
   isAiLastMove,
+  threatCells = [], // リーチマス情報を追加
 }) => {
+  // 指定されたマスがリーチマスかどうかを判定
+  const isThreatCell = (z, x, y) =>
+    threatCells.some(([tz, tx, ty]) => tz === z && tx === x && ty === y);
+
   return (
     <div className="mb-8">
       <h2 className="text-2xl font-bold mb-4 text-blue-400">3D View</h2>
@@ -46,10 +51,12 @@ const ThreeDView = ({
               row.map((cell, y) => {
                 const winning = isCellInWinningPattern(z, x, y);
                 const aiMove = isAiLastMove(z, x, y);
+                const threat = isThreatCell(z, x, y);
 
                 let borderClass = 'border-white';
                 if (winning) borderClass = 'border-yellow-400 animate-pulse';
                 else if (aiMove) borderClass = 'border-lime-400';
+                else if (threat) borderClass = 'border-red-400 animate-pulse';
 
                 return (
                   <div
