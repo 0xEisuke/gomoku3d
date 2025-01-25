@@ -1,5 +1,5 @@
 import React from 'react';
-import Game3D from './gomoku3d';
+import Game3D from './Game3D';
 
 function App() {
   return (
