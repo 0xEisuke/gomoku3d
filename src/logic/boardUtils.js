@@ -78,4 +78,32 @@ export const generateWinPatterns = () => {
     }
     return true;
   };
+
+  // リーチ判定: 指定されたプレイヤーがリーチを作るセルを特定する
+  export const findThreats = (boardState, winPatterns, player) => {
+    const opponent = player === 'X' ? 'O' : 'X';
+    const threats = [];
+
+    winPatterns.forEach(({ cells }) => {
+      let countPlayer = 0;
+      let countEmpty = 0;
+      let emptyCell = null;
+
+      cells.forEach(([z, x, y]) => {
+        if (boardState[z][x][y] === player) countPlayer++;
+        if (!boardState[z][x][y]) {
+          countEmpty++;
+          emptyCell = [z, x, y];
+        }
+      });
+
+      // リーチ条件: プレイヤーの駒が3つ & 空きが1つ
+      if (countPlayer === 3 && countEmpty === 1) {
+        threats.push(emptyCell); // 空きマスを追加
+      }
+    });
+
+    return threats;
+  };
+
   
