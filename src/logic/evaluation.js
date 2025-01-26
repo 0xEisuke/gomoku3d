@@ -17,6 +17,8 @@ export const evaluateBoard = (boardState, winPatterns) => {
   if (winner === 'O') return -10000;
 
   let score = 0;
+  let threatPaths = { X: 0, O: 0 };
+
   for (const pattern of winPatterns) {
     const { cells } = pattern;
     let xCount = 0;
@@ -35,6 +37,7 @@ export const evaluateBoard = (boardState, winPatterns) => {
       switch (xCount) {
         case 3:
           score += 50;
+          threatPaths.X++;
           break;
         case 2:
           score += 5;
@@ -42,13 +45,12 @@ export const evaluateBoard = (boardState, winPatterns) => {
         case 1:
           score += 1;
           break;
-        default:
-          break;
       }
     } else if (oCount > 0) {
       switch (oCount) {
         case 3:
           score -= 50;
+          threatPaths.O++;
           break;
         case 2:
           score -= 5;
@@ -56,11 +58,14 @@ export const evaluateBoard = (boardState, winPatterns) => {
         case 1:
           score -= 1;
           break;
-        default:
-          break;
       }
     }
   }
+
+  // Bonus for multiple threat paths
+  if (threatPaths.X > 1) score += 500;  // Significant bonus for multiple X threats
+  if (threatPaths.O > 1) score -= 500;  // Significant penalty for multiple O threats
+
   return score;
 };
 
