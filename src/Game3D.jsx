@@ -81,7 +81,11 @@ const Game3D = () => {
     newBoard[selectedLayer][x][y] = 'X';
 
     // 履歴に現在の状態を保存
-    setMoveHistory((prev) => [...prev, { board: board, player: 'X' }]);
+    setMoveHistory((prev) => [...prev, { 
+      board: board, 
+      player: 'X',
+      lastMove: null // No last move for player's turn
+    }]);
 
     const result = checkWinnerAndCells(newBoard);
     if (result) {
@@ -124,7 +128,11 @@ const Game3D = () => {
     setAiLastMove([z, x, y]);
 
     // 履歴に現在の状態を保存
-    setMoveHistory((prev) => [...prev, { board: board, player: 'O' }]);
+    setMoveHistory((prev) => [...prev, { 
+      board: board, 
+      player: 'O',
+      lastMove: move // Store AI's last move
+    }]);
 
     const result = checkWinnerAndCells(newBoard);
     if (result) {
@@ -147,21 +155,33 @@ const Game3D = () => {
     setSelectedLayer(0);
     setAiLastMove(null);
     setCurrentPlayer('X');
+    setThreatCells([]);
   };
 
   const handleUndo = () => {
     if (moveHistory.length < 2) return; // AIとプレイヤーの手がなければ戻れない
   
     const newHistory = [...moveHistory];
-    newHistory.pop(); // AIの手を削除
-    const previousState = newHistory.pop(); // プレイヤーの手を削除
+    const aiMove = newHistory.pop(); // AIの手を削除
+    const playerMove = newHistory.pop(); // プレイヤーの手を削除
   
-    if (previousState) {
-      setBoard(previousState.board);
+    if (playerMove) {
+      setBoard(playerMove.board);
       setMoveHistory(newHistory);
       setCurrentPlayer('X'); // プレイヤーの手番に戻す
-      setThreatCells([]);
       setWinner(null);
+      setWinningCells([]);
+  
+      // 前のAIの手を復元
+      const previousAiMove = newHistory.find(move => move.player === 'O');
+      if (previousAiMove) {
+        setAiLastMove(previousAiMove.lastMove);
+        const threats = findThreats(playerMove.board, winPatterns, 'O');
+        setThreatCells(threats);
+      } else {
+        setAiLastMove(null);
+        setThreatCells([]);
+      }
     }
   };
   
