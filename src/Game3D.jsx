@@ -158,6 +158,7 @@ const Game3D = () => {
     setThreatCells([]);
   };
 
+  // undo 機能
   const handleUndo = () => {
     if (moveHistory.length < 2) return; // AIとプレイヤーの手がなければ戻れない
   
