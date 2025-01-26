@@ -26,6 +26,13 @@ export const getBestMove = (boardState, player, depth, alpha, beta, winPatterns)
 
     for (const [z, x, y] of moves) {
       boardState[z][x][y] = 'X';
+
+      // 勝利が確定する場合は即座にその手を選択
+      if (checkWinner(boardState, winPatterns) === 'X') {
+        boardState[z][x][y] = null;
+        return { score: 10000, move: [z, x, y] };
+      }
+      
       const result = getBestMove(boardState, opponent, depth - 1, alpha, beta, winPatterns);
       boardState[z][x][y] = null;
 
@@ -44,6 +51,13 @@ export const getBestMove = (boardState, player, depth, alpha, beta, winPatterns)
 
     for (const [z, x, y] of moves) {
       boardState[z][x][y] = 'O';
+
+      // 勝利が確定する場合は即座にその手を選択
+      if (checkWinner(boardState, winPatterns) === 'O') {
+        boardState[z][x][y] = null;
+        return { score: -10000, move: [z, x, y] };
+      }
+
       const result = getBestMove(boardState, opponent, depth - 1, alpha, beta, winPatterns);
       boardState[z][x][y] = null;
 
